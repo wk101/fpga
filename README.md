@@ -17,7 +17,7 @@ The following approach is followed to implement the market-making algorithm with
 
 1. **F1 Instance**: An F1 instance is provisioned on AWS, which combines CPUs with Xilinx UltraScale+ FPGAs. F1 instances offer a high-performance computing environment suitable for FPGA acceleration.
 
-2. **AFI Creation**: Using the Xilinx Vivado Design Suite, an Amazon FPGA Image (AFI) is generated. The AFI encapsulates the FPGA configuration specific to the targeted F1 instance. It contains the bitstream that configures the FPGA for the market-making algorithm.
+2. **AFI Creation**: Using the Xilinx Vivado Design Suite, or SDAccel an Amazon FPGA Image (AFI) is generated. The AFI encapsulates the FPGA configuration specific to the targeted F1 instance. It contains the bitstream that configures the FPGA for the market-making algorithm.
 
 3. **WebSocket Connection**: The project establishes a WebSocket connection with the BitMEX WebSocket API to receive real-time bids and ask prices. This connection is handled using a WebSocket library, such as WebSocket++.
 
