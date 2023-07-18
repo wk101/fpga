@@ -89,8 +89,8 @@ int main() {
             //std::vector<double> source_b(DATA_SIZE, 32.0);
             //std::vector<double> source_results(DATA_SIZE);
 
-            performFPGAVectorAddition(source_a, source_b, source_results, DATA_SIZE);
-
+            performFPGAVectorAddition(positionsSymbol1, positionsSymbol2, positionsTotal, DATA_SIZE);
+            double totalPosition = positionsTotal[0]
             totalPNL = pnlSymbol1 + pnlSymbol2;
             std::cout << "Position Symbol ID: 1 | Quantity: " << positionsSymbol1[0] << " | PNL: " << pnlSymbol1 << "\n";
             std::cout << "Position Symbol ID: 2 | Quantity: " << positionsSymbol2[0] << " | PNL: " << pnlSymbol2 << "\n";
