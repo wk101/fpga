@@ -28,63 +28,119 @@ As of now, we have successfully implemented the vector addition using the FPGA k
 
 ## Code Overview
 
-```cpp
-// ... Code for generating market data and defining market makers ...
+```txt simulation
 
-#include "xcl2.hpp"
-#include <vector>
-
-// ... Existing code ...
-
-int main() {
-    // ... Existing code ...
-
-    // Initialize OpenCL
-    std::vector<cl::Device> devices = xcl::get_xil_devices();
-    cl::Device device = devices[0];
-    cl::Context context(device);
-    cl::CommandQueue q(context, device, CL_QUEUE_PROFILING_ENABLE);
-
-    // Compute the size of arrays in bytes
-    size_t size_in_bytes = marketData.size() * sizeof(int);
-
-    // Create OpenCL buffers for position vectors
-    cl::Buffer buffer_position_a(context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,
-                                 size_in_bytes, marketData.data());
-    cl::Buffer buffer_position_b(context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY,
-                                 size_in_bytes, marketData.data());
-    cl::Buffer buffer_result(context, CL_MEM_USE_HOST_PTR | CL_MEM_WRITE_ONLY,
-                             size_in_bytes, marketData.data());
-
-    // Separate Read/write Buffer vector is needed to migrate data between host/device
-    std::vector<cl::Memory> inBufVec, outBufVec;
-    inBufVec.push_back(buffer_position_a);
-    inBufVec.push_back(buffer_position_b);
-    outBufVec.push_back(buffer_result);
-
-    // Execute the vector addition kernel
-    cl::Kernel krnl_vector_add(program, "vector_add");
-    int narg = 0;
-    krnl_vector_add.setArg(narg++, buffer_result);
-    krnl_vector_add.setArg(narg++, buffer_position_a);
-    krnl_vector_add.setArg(narg++, buffer_position_b);
-    krnl_vector_add.setArg(narg++, marketData.size());
-
-    q.enqueueMigrateMemObjects(inBufVec, 0 /* 0 means from host */);
-    q.enqueueTask(krnl_vector_add);
-    q.enqueueMigrateMemObjects(outBufVec, CL_MIGRATE_MEM_OBJECT_HOST);
-    q.finish();
-
-    // Print the combined position vector (result)
-    std::vector<MarketData> combinedPositions(marketData.size());
-    std::memcpy(combinedPositions.data(), marketData.data(), size_in_bytes);
-    for (const auto& data : combinedPositions) {
-        constantSpreadMarketMaker(data);
-    }
-
-    return 0;
-}
-
+Total Position: 1000
+Total PNL: -59.3603
+-----------------------------
+Updating Market Data - Second 31
+Sell Order - Symbol ID: 2 | Quantity: 100 | Price: 99.8931
+Sell Order - Symbol ID: 2 | Quantity: 100 | Price: 100.005
+Updating Market Data - Second 32
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 99.9936
+Sell Order - Symbol ID: 2 | Quantity: 100 | Price: 100.347
+Updating Market Data - Second 33
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 100.38
+Sell Order - Symbol ID: 2 | Quantity: 100 | Price: 100.094
+Updating Market Data - Second 34
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 100.532
+Sell Order - Symbol ID: 2 | Quantity: 100 | Price: 100.282
+Updating Market Data - Second 35
+Sell Order - Symbol ID: 2 | Quantity: 100 | Price: 100.209
+Sell Order - Symbol ID: 2 | Quantity: 100 | Price: 100.125
+Updating Market Data - Second 36
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 99.8654
+Sell Order - Symbol ID: 2 | Quantity: 100 | Price: 99.9035
+Updating Market Data - Second 37
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 99.5056
+Sell Order - Symbol ID: 2 | Quantity: 100 | Price: 99.8922
+Updating Market Data - Second 38
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 99.1851
+Sell Order - Symbol ID: 2 | Quantity: 100 | Price: 100.289
+Updating Market Data - Second 39
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 99.3326
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 100.734
+Updating Market Data - Second 40
+Sell Order - Symbol ID: 2 | Quantity: 100 | Price: 99.5697
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 100.683
+Closing Positions - Second 40
+Position Symbol ID: 1 | Quantity: 700 | PNL: -301.228
+Position Symbol ID: 2 | Quantity: 200 | PNL: 136.543
+Total Position: 900
+Total PNL: -164.685
+-----------------------------
+Updating Market Data - Second 41
+Sell Order - Symbol ID: 2 | Quantity: 100 | Price: 99.2643
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 101.158
+Updating Market Data - Second 42
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 99.1739
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 101.302
+Updating Market Data - Second 43
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 99.6386
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 101.411
+Updating Market Data - Second 44
+Sell Order - Symbol ID: 2 | Quantity: 100 | Price: 99.6951
+Sell Order - Symbol ID: 2 | Quantity: 100 | Price: 101.638
+Updating Market Data - Second 45
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 99.6544
+Sell Order - Symbol ID: 2 | Quantity: 100 | Price: 101.704
+Updating Market Data - Second 46
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 99.828
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 101.242
+Updating Market Data - Second 47
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 99.3962
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 101.018
+Updating Market Data - Second 48
+Sell Order - Symbol ID: 2 | Quantity: 100 | Price: 99.6985
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 101.022
+Updating Market Data - Second 49
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 99.2391
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 100.616
+Updating Market Data - Second 50
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 99.6634
+Sell Order - Symbol ID: 2 | Quantity: 100 | Price: 100.669
+Closing Positions - Second 50
+Position Symbol ID: 1 | Quantity: 700 | PNL: -235.586
+Position Symbol ID: 2 | Quantity: 700 | PNL: 468.066
+Total Position: 1400
+Total PNL: 232.48
+-----------------------------
+Updating Market Data - Second 51
+Sell Order - Symbol ID: 2 | Quantity: 100 | Price: 99.3947
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 100.369
+Updating Market Data - Second 52
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 99.0645
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 100.175
+Updating Market Data - Second 53
+Sell Order - Symbol ID: 2 | Quantity: 100 | Price: 99.0678
+Sell Order - Symbol ID: 2 | Quantity: 100 | Price: 99.7659
+Updating Market Data - Second 54
+Sell Order - Symbol ID: 2 | Quantity: 100 | Price: 99.3044
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 99.4095
+Updating Market Data - Second 55
+Sell Order - Symbol ID: 2 | Quantity: 100 | Price: 99.0243
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 99.5067
+Updating Market Data - Second 56
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 99.3968
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 99.9877
+Updating Market Data - Second 57
+Sell Order - Symbol ID: 2 | Quantity: 100 | Price: 99.4
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 100.413
+Updating Market Data - Second 58
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 99.6574
+Sell Order - Symbol ID: 2 | Quantity: 100 | Price: 100.56
+Updating Market Data - Second 59
+Sell Order - Symbol ID: 2 | Quantity: 100 | Price: 99.5313
+Sell Order - Symbol ID: 2 | Quantity: 100 | Price: 100.729
+Updating Market Data - Second 60
+Buy Order - Symbol ID: 1 | Quantity: 100 | Price: 99.6379
+Sell Order - Symbol ID: 2 | Quantity: 100 | Price: 101.019
+Closing Positions - Second 60
+Position Symbol ID: 1 | Quantity: 400 | PNL: -144.859
+Position Symbol ID: 2 | Quantity: 600 | PNL: 611.58
+Total Position: 1000
+Total PNL: 466.721
+-----------------------------
 
 ```
 
